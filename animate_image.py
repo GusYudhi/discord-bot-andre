@@ -25,41 +25,6 @@ def blink_images(image1: Image.Image, image2: Image.Image):
 		image2 = squish_image(image2, image1.size)
 	return [image1, image2]
 
-# Translates this p5.js code into python
-# let img;
-# let imgWidth
-# let gravity = 2;
-# let y;
-# let x = 0;
-# let goingRight = true;
-# let velocity = 1;
-
-# function setup() {
-#   createCanvas(400, 400);
-#   img = loadImage("images/baboon.png");
-#   imgWidth = width / 2;
-#   y = imgWidth
-# }
-
-# function draw() {
-#   background(0, 255, 0);
-#   image(img, x, y, imgWidth, imgWidth);
-#   if (x + imgWidth >= width) {
-#     goingRight = false
-#   } else if (x <= 0) {
-#     goingRight = true
-#   }
-#   if (goingRight) {
-#     x += 3
-#   } else {
-#     x -= 3
-#   }
-#   if (y + imgWidth >= height) {
-#     velocity -= 30
-#   }
-#   y += velocity;
-#   velocity += gravity;
-# }
 def bouncing_image(image: Image.Image):
 	width = 400
 	img_width = int(width / 2)

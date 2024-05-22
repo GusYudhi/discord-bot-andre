@@ -46,6 +46,18 @@ async def blur(interaction: discord.Interaction, image: discord.Attachment, blur
     img = await get_pillow_image(image)
     img = img.filter(ImageFilter.GaussianBlur(radius=blur))
     await send_image(interaction, img, filename)
+    
+@bot.tree.command(name="big_head", description="Big Head Effect")
+@discord.app_commands.describe(image="The image")
+async def blur(interaction: discord.Interaction, image: discord.Attachment):
+    await interaction.response.defer()
+    filename = image.filename
+    if not check_is_image(image):
+        await interaction.followup.send("That's not an image!", ephemeral=True)
+        return
+    img = await get_pillow_image(image)
+    img = big_head_effect(img)
+    await send_image(interaction, img, filename)
 
 @bot.tree.command(name="resize", description="Resize an Image")
 @discord.app_commands.describe(image="The image", width="Width", height="Height")
