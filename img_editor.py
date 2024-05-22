@@ -20,45 +20,40 @@ def squish_image(image: Image.Image, size: tuple[int, int]):
 	width, height = size
 	return image.resize((width, height), Image.LANCZOS)	
 
-def big_head_effect(image):
-    # Convert the image to numpy array
+def big_head_effect(image, amount=1.5):
+    # Convert PIL Image to OpenCV format
     img_array = np.array(image)
     height, width, channels = img_array.shape
 
-    # Define the scaling factor and the region to scale
-    scale_factor = 1.5
+    # Define the center and region size
     center_x, center_y = width // 2, height // 2
     region_size = min(center_x, center_y) // 2
 
-    # Create an empty array for the output image
-    output_array = np.zeros_like(img_array)
+    # Create a meshgrid of coordinates
+    x_coords, y_coords = np.meshgrid(np.arange(width), np.arange(height))
 
-    for y in range(height):
-        for x in range(width):
-            # Calculate the distance from the center
-            dist_x = (x - center_x) / region_size
-            dist_y = (y - center_y) / region_size
-            distance = np.sqrt(dist_x**2 + dist_y**2)
+    # Calculate the distances from the center
+    dist_x = (x_coords - center_x) / region_size
+    dist_y = (y_coords - center_y) / region_size
+    distances = np.sqrt(dist_x**2 + dist_y**2)
 
-            # Scale the distance based on the scaling factor
-            if distance < 1:
-                scale = 1 + (scale_factor - 1) * (1 - distance)
-            else:
-                scale = 1
+    # Apply scaling based on distance
+    scale = np.where(distances < 1, 1 + (amount - 1) * (1 - distances), 1)
 
-            new_x = center_x + (x - center_x) / scale
-            new_y = center_y + (y - center_y) / scale
+    # Calculate new coordinates
+    new_x_coords = center_x + (x_coords - center_x) / scale
+    new_y_coords = center_y + (y_coords - center_y) / scale
 
-            # Ensure the new coordinates are within image boundaries
-            new_x = np.clip(new_x, 0, width - 1)
-            new_y = np.clip(new_y, 0, height - 1)
+    # Clip coordinates to image boundaries
+    new_x_coords = np.clip(new_x_coords, 0, width - 1).astype(np.float32)
+    new_y_coords = np.clip(new_y_coords, 0, height - 1).astype(np.float32)
 
-            output_array[y, x] = img_array[int(new_y), int(new_x)]
+    # Map the coordinates to the original image using remap
+    new_img_array = cv2.remap(img_array, new_x_coords, new_y_coords, interpolation=cv2.INTER_LINEAR)
 
-    # Convert the output array back to an image
-    output_image = Image.fromarray(output_array)
+    # Convert back to PIL Image
+    output_image = Image.fromarray(new_img_array)
     return output_image
-
 
 def blend_images(image1: Image.Image, image2: Image.Image, percentage: int):
 	# If the size of the images are not the same, raise an error

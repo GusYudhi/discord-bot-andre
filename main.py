@@ -48,15 +48,15 @@ async def blur(interaction: discord.Interaction, image: discord.Attachment, blur
     await send_image(interaction, img, filename)
     
 @bot.tree.command(name="big_head", description="Big Head Effect")
-@discord.app_commands.describe(image="The image")
-async def blur(interaction: discord.Interaction, image: discord.Attachment):
+@discord.app_commands.describe(image="The image", amount="Amount")
+async def blur(interaction: discord.Interaction, image: discord.Attachment, amount: float = 1.5):
     await interaction.response.defer()
     filename = image.filename
     if not check_is_image(image):
         await interaction.followup.send("That's not an image!", ephemeral=True)
         return
     img = await get_pillow_image(image)
-    img = big_head_effect(img)
+    img = big_head_effect(img, amount)
     await send_image(interaction, img, filename)
 
 @bot.tree.command(name="resize", description="Resize an Image")
